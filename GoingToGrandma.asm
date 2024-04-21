@@ -1,4 +1,4 @@
-; version 10.1
+; version 10.2
 ; a short program to check how
 ; set and get pixel color works
 .MODEL small
@@ -20,10 +20,14 @@ x_value dw 10
 decision dw ?
 color db 0fh 
 y_stickman dw 150
-x_stickman dw 30
+x_stickman dw 30 
+x_centergrandma dw 240
+y_centergrandma dw 140
+y_valuegrandma dw 0 
+x_valuegrandma dw 10
 h_man dw 30
-
- 
+h_grandma dw 15
+second_decision dw ? 
      
 .CODE
 
@@ -348,8 +352,259 @@ endp stickman
     
     
     
+;________________________________________________________________________________________
     
-    
+ 
+
+     proc grandma
+
+     mov bx,x_valuegrandma
+     mov ax,2
+     mul bx
+     mov bx,3
+     sub bx,ax 
+     mov second_decision,bx
+     mov al,color
+     mov ah,0ch
+     drawsecond_circle:
+     mov al,color
+     mov ah,0ch 
+     mov cx, x_valuegrandma
+     add cx, x_centergrandma 
+     mov dx, y_valuegrandma
+     add dx, y_centergrandma
+     int 10h
+     mov cx, x_valuegrandma 
+     neg cx
+     add cx, x_centergrandma 
+     int 10h
+     mov cx, y_valuegrandma     
+     add cx, x_centergrandma 
+     mov dx, x_valuegrandma
+     add dx, y_centergrandma
+     int 10h 
+     mov cx, y_valuegrandma 
+     neg cx
+     add cx, x_centergrandma 
+     int 10h
+     mov cx, x_valuegrandma 
+     add cx, x_centergrandma
+     mov dx, y_valuegrandma
+     neg dx
+     add dx, y_centergrandma
+     int 10h
+
+; 
+
+ mov cx, x_valuegrandma 
+ neg cx
+
+ add cx, x_centergrandma 
+
+ int 10h
+
+
+
+ mov cx, y_valuegrandma 
+
+ add cx, x_centergrandma 
+
+ mov dx, x_valuegrandma
+
+ neg dx
+
+ add dx, y_centergrandma
+
+ int 10h
+
+; 
+
+ mov cx, y_valuegrandma 
+
+ neg cx
+
+ add cx, x_centergrandma 
+
+ int 10h
+
+ 
+
+conditio3:
+
+ cmp second_decision,0
+
+ jg condition4      
+
+ mov cx, y_valuegrandma
+
+ mov ax, 2
+
+ imul cx 
+
+ add ax, 3 
+
+ mov bx, 2
+
+ mul bx  
+
+ add second_decision, ax
+
+ mov bx, y_valuegrandma
+
+ mov dx, x_valuegrandma
+
+ 
+
+  
+
+ inc y_valuegrandma
+
+ jmp drawsecond_circle
+
+
+
+condition4:
+
+ mov cx, y_valuegrandma 
+
+ mov ax,2
+
+ mul cx 
+
+ mov bx,ax
+
+ mov cx, x_valuegrandma
+
+ mov ax, -2
+
+ imul cx 
+
+ add bx,ax
+
+ add bx,5
+
+ mov ax,2
+
+ imul bx        
+
+ add second_decision,ax
+
+ mov bx, y_valuegrandma
+
+ mov dx, x_valuegrandma
+
+ cmp bx, dx
+
+ ja second_donedrawing
+
+ dec x_valuegrandma    
+
+ inc y_valuegrandma
+
+ jmp drawsecond_circle
+ 
+second_donedrawing:
+mov cx,x_centergrandma
+mov dx,y_stickman
+add dx,h_grandma
+mov al,0fh
+mov ah,0ch
+next5:
+int 10h
+dec dx
+cmp dx,y_stickman
+jne next5
+;lf hand
+mov bx,10
+mov cx,240
+mov dx,155
+mov ah,0ch
+mov al,0fh
+grandma_lfhand:
+int 10h
+ inc cx  
+ inc dx 
+ dec bx 
+ cmp bx,0
+ jne grandma_lfhand 
+ ;r_hand
+    mov bx,10
+    mov cx,240
+    mov dx,155
+    mov ah,0ch
+    mov al,0fh
+grandma_rhandloop:
+int 10h
+dec cx ; increase x values 
+ inc dx ; decrease y values
+ dec bx ; decrease length
+ cmp bx,0
+ jne grandma_rhandloop
+ 
+ ;lf lag
+mov bx,10
+mov cx,240
+mov dx,165
+mov ah,0ch
+mov al,0fh
+grandma_lfleg:
+int 10h
+ inc cx  
+ inc dx 
+ dec bx 
+ cmp bx,0
+ jne grandma_lfleg 
+ ;r lag
+    mov bx,10
+    mov cx,240
+    mov dx,165
+    mov ah,0ch
+    mov al,0fh
+grandma_rlegloop:
+int 10h
+dec cx ; increase x values 
+ inc dx ; decrease y values
+ dec bx ; decrease length
+ cmp bx,0
+ jne grandma_rlegloop 
+ 
+ ;woman scart
+ 
+ mov dx,175
+ mov cx,230
+ add cx,20
+ woman:
+ int 10h
+ dec cx
+ cmp cx,230
+ jne woman
+ 
+ 
+ mov dx,175
+ add dx,10
+ mov cx,235
+ grandma_leg:
+ int 10h
+ dec dx
+ cmp dx,176
+ jne grandma_leg 
+ 
+ 
+ mov dx,175
+ add dx,10
+ mov cx,245
+ grandma_leg1:
+ int 10h
+ dec dx
+ cmp dx,175
+ jne grandma_leg1
+ 
+  
+
+ret
+endp grandma
+
+     
     
 
 start:
@@ -459,7 +714,7 @@ start:
 
  call stickman
 
-
+ call grandma
 
 exit:
 			
