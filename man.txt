@@ -6,24 +6,23 @@
 .DATA
 
 
-x_center dw 20
-y_center dw 130
-y_value dw 0
-x_value dw 10 
+x_center_man dw 30
+y_center_man dw 140
+y_value_man dw 0
+x_value_man dw 10 
 decision dw ?
 color db 0fh 
-y_stickman dw 150
-x_stickman dw 30
-h dw 30
+length_man_of_stickman dw 10
+h_man dw 30
     
 .CODE
-proc circle
+proc stickman
 
  
 
 
 
-     mov bx, x_value
+     mov bx, x_value_man
      mov ax,2
      mul bx
      mov bx,3
@@ -34,239 +33,231 @@ proc circle
      drawcircle:
      mov al,color
      mov ah,0ch 
-     mov cx, x_value
-     add cx, x_center 
-     mov dx, y_value
-     add dx, y_center
+     mov cx, x_value_man
+     add cx, x_center_man 
+     mov dx, y_value_man
+     add dx, y_center_man
      int 10h
-     mov cx, x_value 
+     mov cx, x_value_man 
      neg cx
-     add cx, x_center 
+     add cx, x_center_man 
      int 10h
-     mov cx, y_value     
-     add cx, x_center 
-     mov dx, x_value
-     add dx, y_center
+     mov cx, y_value_man     
+     add cx, x_center_man 
+     mov dx, x_value_man
+     add dx, y_center_man
      int 10h 
-     mov cx, y_value 
+     mov cx, y_value_man 
      neg cx
-     add cx, x_center 
+     add cx, x_center_man 
      int 10h
-     mov cx, x_value 
-     add cx, x_center
-     mov dx, y_value
+     mov cx, x_value_man 
+     add cx, x_center_man
+     mov dx, y_value_man
      neg dx
-     add dx, y_center
+     add dx, y_center_man
      int 10h
 
 ; 
 
- mov cx, x_value 
- neg cx
+    mov cx, x_value_man
+     
+    neg cx
 
- add cx, x_center 
+    add cx, x_center_man 
+    
+    int 10h
 
- int 10h
 
 
+    mov cx, y_value_man 
 
- mov cx, y_value 
+    add cx, x_center_man 
 
- add cx, x_center 
+    mov dx, x_value_man
 
- mov dx, x_value
+    neg dx
 
- neg dx
+    add dx, y_center_man
 
- add dx, y_center
-
- int 10h
+    int 10h
 
 ; 
 
- mov cx, y_value 
+    mov cx, y_value_man 
 
- neg cx
+    neg cx
 
- add cx, x_center 
+    add cx, x_center_man 
 
- int 10h
+    int 10h
 
  
 
 condition1:
 
- cmp decision,0
+    cmp decision,0
 
- jg condition2      
+    jg condition2      
 
- mov cx, y_value
+    mov cx, y_value_man
 
- mov ax, 2
+    mov ax, 2
 
- imul cx 
+    imul cx 
 
- add ax, 3 
+    add ax, 3 
 
- mov bx, 2
+    mov bx, 2
 
- mul bx  
+    mul bx  
 
- add decision, ax
+    add decision, ax
 
- mov bx, y_value
+    mov bx, y_value_man
 
- mov dx, x_value
+    mov dx, x_value_man
 
  
 
   
 
- inc y_value
+    inc y_value_man
 
- jmp drawcircle
+    jmp drawcircle
 
 
 
 condition2:
 
- mov cx, y_value 
+    mov cx, y_value_man 
 
- mov ax,2
+    mov ax,2
 
- mul cx 
+    mul cx 
 
- mov bx,ax
+    mov bx,ax
 
- mov cx, x_value
+    mov cx, x_value_man
+    
+    mov ax, -2 
+    
+    imul cx 
 
- mov ax, -2
+    add bx,ax
 
- imul cx 
+    add bx,5
 
- add bx,ax
+    mov ax,2
 
- add bx,5
+    imul bx        
 
- mov ax,2
+    add decision,ax
 
- imul bx        
+    mov bx, y_value_man
 
- add decision,ax
+    mov dx, x_value_man
 
- mov bx, y_value
+    cmp bx, dx
 
- mov dx, x_value
+    ja donedrawing
 
- cmp bx, dx
+    dec x_value_man    
 
- ja donedrawing
+    inc y_value_man
 
- dec x_value    
-
- inc y_value
-
- jmp drawcircle
+    jmp drawcircle
  
-donedrawing:
-mov cx,x_stickman
-mov dx,y_stickman
-add dx,h
-mov al,0fh
-mov ah,0ch
+donedrawing: 
+;Th_manE SPINE OF Th_manE STIKE MAN
+    mov cx,x_center_man 
+    mov dx,y_center_man 
+    add dx,10
+    add dx,h_man
+    mov al,0fh
+    mov ah,0ch 
+    mov bx,length_man_of_stickman
+    add bx,y_center_man
 next3:
-int 10h
-dec dx
-cmp dx,y_stickman
-jne next3
-;lf hand
-mov bx,10
-mov cx,30
-mov dx,155
-mov ah,0ch
-mov al,0fh
-lfhand:
-int 10h
- inc cx  
- inc dx 
- dec bx 
- cmp bx,0
- jne lfhand 
- ;r_hand
+    int 10h
+    dec dx
+    cmp dx,bx
+    jne next3
+;R h_manand
     mov bx,10
-    mov cx,30
-    mov dx,155
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,15
     mov ah,0ch
     mov al,0fh
-rhandloop:
-int 10h
-dec cx ; increase x values 
- inc dx ; decrease y values
- dec bx ; decrease length
- cmp bx,0
- jne rhandloop
+lfh_manand:
+    int 10h
+    inc cx  
+    inc dx 
+    dec bx 
+    cmp bx,0
+    jne lfh_manand 
+ ;l_and
+    mov bx,10
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,15
+    mov ah,0ch
+    mov al,0fh
+rh_manandloop:
+    int 10h
+    dec cx ; increase x values 
+    inc dx ; decrease y values
+    dec bx ; decrease length_man
+    cmp bx,0
+    jne rh_manandloop
  
  ;lf lag
-mov bx,10
-mov cx,30
-mov dx,180
-mov ah,0ch
-mov al,0fh
+    mov bx,10
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,40
+    mov ah,0ch
+    mov al,0fh
 lfleg:
-int 10h
- inc cx  
- inc dx 
- dec bx 
- cmp bx,0
- jne lfleg 
+    int 10h
+    inc cx  
+    inc dx 
+    dec bx 
+    cmp bx,0
+    jne lfleg 
  ;r lag
     mov bx,10
-    mov cx,30
-    mov dx,180
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,40
     mov ah,0ch
     mov al,0fh
 rlegloop:
-int 10h
-dec cx ; increase x values 
- inc dx ; decrease y values
- dec bx ; decrease length
- cmp bx,0
- jne rlegloop
- 
- 
- 
- 
-  
+    int 10h
+    dec cx ; increase x values 
+    inc dx ; decrease y values
+    dec bx ; decrease length_man
+    cmp bx,0
+    jne rlegloop
 
 ret
-endp circle
+endp stickman
 
     
 start:
-    
-    
-    
-
+   
 	mov ax, @data
     mov ds, ax 
     mov ah, 0   ; set display mode function.
-	mov al, 13h ; mode 13h = 320x200 pixels, 256 colors.
+	mov al, 13h ; mode 13h_man = 320x200 pixels, 256 colors.
 	int 10h 
-	    mov ah,0 
+	mov ah,0 
+    int 10h 
 
-   
 
- int 10h 
 
- mov x_center,30
-
- mov y_center,140
-
- mov y_value,0
-
- mov x_value,10
-
- call circle
+    call stickman
 	
 	
 	
@@ -280,7 +271,7 @@ start:
 exit:
 			
 
-  mov AH,4CH
+  mov Ah,4Ch
   int 21h
 
 END start
