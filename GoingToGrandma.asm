@@ -1,6 +1,4 @@
-; version 10.2
-; a short program to check how
-; set and get pixel color works
+; version 10.3
 .MODEL small
 .STACK 100h
 
@@ -12,22 +10,25 @@ row dw 120
 w equ 80
 h equ 75
 column_grandma dw 230
-row_grandma dw 120
-x_center dw 20
-y_center dw 130
-y_value dw 0
-x_value dw 10 
+row_grandma dw 120 
 decision dw ?
-color db 0fh 
-y_stickman dw 150
-x_stickman dw 30 
-x_centergrandma dw 240
-y_centergrandma dw 140
-y_valuegrandma dw 0 
-x_valuegrandma dw 10
+color db 0fh  
+;================================
+x_center_man dw 30
+y_center_man dw 140
+y_value_man dw 0
+x_value_man dw 10  
+length_man_of_stickman dw 10
 h_man dw 30
-h_grandma dw 15
+;================================
+x_centergrandma dw 250
+y_centergrandma dw 140
+y_valuegrandma dw 0
+x_valuegrandma dw 10 
 second_decision dw ? 
+y_stickman dw 10
+h_grandma dw 15 
+count dw 2
      
 .CODE
 
@@ -126,13 +127,13 @@ drawall_grandma  proc
     endp diagonalR
     
     
-    proc stickman
+   proc stickman
 
  
 
 
 
-     mov bx, x_value
+     mov bx, x_value_man
      mov ax,2
      mul bx
      mov bx,3
@@ -143,209 +144,213 @@ drawall_grandma  proc
      drawcircle:
      mov al,color
      mov ah,0ch 
-     mov cx, x_value
-     add cx, x_center 
-     mov dx, y_value
-     add dx, y_center
+     mov cx, x_value_man
+     add cx, x_center_man 
+     mov dx, y_value_man
+     add dx, y_center_man
      int 10h
-     mov cx, x_value 
+     mov cx, x_value_man 
      neg cx
-     add cx, x_center 
+     add cx, x_center_man 
      int 10h
-     mov cx, y_value     
-     add cx, x_center 
-     mov dx, x_value
-     add dx, y_center
+     mov cx, y_value_man     
+     add cx, x_center_man 
+     mov dx, x_value_man
+     add dx, y_center_man
      int 10h 
-     mov cx, y_value 
+     mov cx, y_value_man 
      neg cx
-     add cx, x_center 
+     add cx, x_center_man 
      int 10h
-     mov cx, x_value 
-     add cx, x_center
-     mov dx, y_value
+     mov cx, x_value_man 
+     add cx, x_center_man
+     mov dx, y_value_man
      neg dx
-     add dx, y_center
+     add dx, y_center_man
      int 10h
 
 ; 
 
- mov cx, x_value 
- neg cx
+    mov cx, x_value_man
+     
+    neg cx
 
- add cx, x_center 
+    add cx, x_center_man 
+    
+    int 10h
 
- int 10h
 
 
+    mov cx, y_value_man 
 
- mov cx, y_value 
+    add cx, x_center_man 
 
- add cx, x_center 
+    mov dx, x_value_man
 
- mov dx, x_value
+    neg dx
 
- neg dx
+    add dx, y_center_man
 
- add dx, y_center
-
- int 10h
+    int 10h
 
 ; 
 
- mov cx, y_value 
+    mov cx, y_value_man 
 
- neg cx
+    neg cx
 
- add cx, x_center 
+    add cx, x_center_man 
 
- int 10h
+    int 10h
 
  
 
 condition1:
 
- cmp decision,0
+    cmp decision,0
 
- jg condition2      
+    jg condition2      
 
- mov cx, y_value
+    mov cx, y_value_man
 
- mov ax, 2
+    mov ax, 2
 
- imul cx 
+    imul cx 
 
- add ax, 3 
+    add ax, 3 
 
- mov bx, 2
+    mov bx, 2
 
- mul bx  
+    mul bx  
 
- add decision, ax
+    add decision, ax
 
- mov bx, y_value
+    mov bx, y_value_man
 
- mov dx, x_value
+    mov dx, x_value_man
 
  
 
   
 
- inc y_value
+    inc y_value_man
 
- jmp drawcircle
+    jmp drawcircle
 
 
 
 condition2:
 
- mov cx, y_value 
+    mov cx, y_value_man 
 
- mov ax,2
+    mov ax,2
 
- mul cx 
+    mul cx 
 
- mov bx,ax
+    mov bx,ax
 
- mov cx, x_value
+    mov cx, x_value_man
+    
+    mov ax, -2 
+    
+    imul cx 
 
- mov ax, -2
+    add bx,ax
 
- imul cx 
+    add bx,5
 
- add bx,ax
+    mov ax,2
 
- add bx,5
+    imul bx        
 
- mov ax,2
+    add decision,ax
 
- imul bx        
+    mov bx, y_value_man
 
- add decision,ax
+    mov dx, x_value_man
 
- mov bx, y_value
+    cmp bx, dx
 
- mov dx, x_value
+    ja donedrawing
 
- cmp bx, dx
+    dec x_value_man    
 
- ja donedrawing
+    inc y_value_man
 
- dec x_value    
-
- inc y_value
-
- jmp drawcircle
+    jmp drawcircle
  
-donedrawing:
-mov cx,x_stickman
-mov dx,y_stickman
-add dx,h_man
-mov al,0fh
-mov ah,0ch
+donedrawing: 
+;Th_manE SPINE OF Th_manE STIKE MAN
+    mov cx,x_center_man 
+    mov dx,y_center_man 
+    add dx,10
+    add dx,h_man
+    mov al,color
+    mov ah,0ch 
+    mov bx,length_man_of_stickman
+    add bx,y_center_man
 next3:
-int 10h
-dec dx
-cmp dx,y_stickman
-jne next3
-;lf hand
-mov bx,10
-mov cx,30
-mov dx,155
-mov ah,0ch
-mov al,0fh
-lfhand:
-int 10h
- inc cx  
- inc dx 
- dec bx 
- cmp bx,0
- jne lfhand 
- ;r_hand
+    int 10h
+    dec dx
+    cmp dx,bx
+    jne next3
+;R h_manand
     mov bx,10
-    mov cx,30
-    mov dx,155
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,15
     mov ah,0ch
-    mov al,0fh
-rhandloop:
-int 10h
-dec cx ; increase x values 
- inc dx ; decrease y values
- dec bx ; decrease length
- cmp bx,0
- jne rhandloop
+   
+lfh_manand:
+    int 10h
+    inc cx  
+    inc dx 
+    dec bx 
+    cmp bx,0
+    jne lfh_manand 
+ ;l_and
+    mov bx,10
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,15
+    mov ah,0ch
+    
+rh_manandloop:
+    int 10h
+    dec cx ; increase x values 
+    inc dx ; decrease y values
+    dec bx ; decrease length_man
+    cmp bx,0
+    jne rh_manandloop
  
  ;lf lag
-mov bx,10
-mov cx,30
-mov dx,180
-mov ah,0ch
-mov al,0fh
+    mov bx,10
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,40
+    mov ah,0ch
+    
 lfleg:
-int 10h
- inc cx  
- inc dx 
- dec bx 
- cmp bx,0
- jne lfleg 
+    int 10h
+    inc cx  
+    inc dx 
+    dec bx 
+    cmp bx,0
+    jne lfleg 
  ;r lag
     mov bx,10
-    mov cx,30
-    mov dx,180
+    mov cx,x_center_man
+    mov dx,y_center_man 
+    add dx,40
     mov ah,0ch
-    mov al,0fh
+    
 rlegloop:
-int 10h
-dec cx ; increase x values 
- inc dx ; decrease y values
- dec bx ; decrease length
- cmp bx,0
- jne rlegloop
- 
- 
- 
- 
-  
+    int 10h
+    dec cx ; increase x values 
+    inc dx ; decrease y values
+    dec bx ; decrease length_man
+    cmp bx,0
+    jne rlegloop
 
 ret
 endp stickman
@@ -356,9 +361,13 @@ endp stickman
     
  
 
-     proc grandma
+proc grandma
 
-     mov bx,x_valuegrandma
+ 
+
+
+
+     mov bx, x_valuegrandma
      mov ax,2
      mul bx
      mov bx,3
@@ -396,208 +405,224 @@ endp stickman
 
 ; 
 
- mov cx, x_valuegrandma 
- neg cx
+    mov cx, x_valuegrandma 
+    neg cx
 
- add cx, x_centergrandma 
+    add cx, x_centergrandma 
 
- int 10h
+    int 10h
 
 
 
- mov cx, y_valuegrandma 
+    mov cx, y_valuegrandma 
 
- add cx, x_centergrandma 
+    add cx, x_centergrandma 
 
- mov dx, x_valuegrandma
+    mov dx, x_valuegrandma
 
- neg dx
+    neg dx
 
- add dx, y_centergrandma
+    add dx, y_centergrandma
 
- int 10h
+    int 10h
 
 ; 
 
- mov cx, y_valuegrandma 
+    mov cx, y_valuegrandma 
 
- neg cx
+    neg cx
 
- add cx, x_centergrandma 
+    add cx, x_centergrandma 
 
- int 10h
+    int 10h
 
  
 
 conditio3:
 
- cmp second_decision,0
+    cmp second_decision,0
 
- jg condition4      
+    jg condition4      
 
- mov cx, y_valuegrandma
+    mov cx, y_valuegrandma
 
- mov ax, 2
+    mov ax, 2
 
- imul cx 
+    imul cx 
 
- add ax, 3 
+    add ax, 3 
 
- mov bx, 2
+    mov bx, 2
 
- mul bx  
+    mul bx  
 
- add second_decision, ax
+    add second_decision, ax
 
- mov bx, y_valuegrandma
+    mov bx, y_valuegrandma
 
- mov dx, x_valuegrandma
+    mov dx, x_valuegrandma
 
  
 
   
 
- inc y_valuegrandma
+    inc y_valuegrandma
 
- jmp drawsecond_circle
+    jmp drawsecond_circle
 
 
 
 condition4:
 
- mov cx, y_valuegrandma 
+    mov cx, y_valuegrandma 
 
- mov ax,2
+    mov ax,2
 
- mul cx 
+    mul cx 
 
- mov bx,ax
+    mov bx,ax
 
- mov cx, x_valuegrandma
+    mov cx, x_valuegrandma
 
- mov ax, -2
+    mov ax, -2
 
- imul cx 
+    imul cx 
 
- add bx,ax
+    add bx,ax
 
- add bx,5
+    add bx,5
 
- mov ax,2
+    mov ax,2
 
- imul bx        
+    imul bx        
 
- add second_decision,ax
+    add second_decision,ax
+                                             
+                                             
+    mov bx, y_valuegrandma
 
- mov bx, y_valuegrandma
+    mov dx, x_valuegrandma
 
- mov dx, x_valuegrandma
+    cmp bx, dx
 
- cmp bx, dx
+    ja second_donedrawing
 
- ja second_donedrawing
+    dec x_valuegrandma    
 
- dec x_valuegrandma    
+    inc y_valuegrandma
 
- inc y_valuegrandma
-
- jmp drawsecond_circle
+    jmp drawsecond_circle
  
-second_donedrawing:
-mov cx,x_centergrandma
-mov dx,y_stickman
-add dx,h_grandma
-mov al,0fh
-mov ah,0ch
+second_donedrawing: 
+;woman spine 
+    mov cx,x_centergrandma
+    mov dx,y_stickman 
+    add dx,h_grandma 
+    add dx,y_centergrandma
+    mov bx,y_centergrandma
+    add bx,y_stickman
+    mov al,0fh
+    mov ah,0ch
 next5:
-int 10h
-dec dx
-cmp dx,y_stickman
-jne next5
+    int 10h
+    dec dx
+    cmp dx,bx
+    jne next5
 ;lf hand
-mov bx,10
-mov cx,240
-mov dx,155
-mov ah,0ch
-mov al,0fh
+    mov bx,10
+    mov cx,x_centergrandma
+    mov dx,y_centergrandma 
+    add dx,h_grandma
+    mov ah,0ch
+    mov al,0fh
 grandma_lfhand:
-int 10h
- inc cx  
- inc dx 
- dec bx 
- cmp bx,0
- jne grandma_lfhand 
+    int 10h
+    inc cx  
+    inc dx 
+    dec bx 
+    cmp bx,0
+    jne grandma_lfhand 
  ;r_hand
     mov bx,10
-    mov cx,240
-    mov dx,155
+    mov cx,x_centergrandma
+    mov dx,y_centergrandma 
+    add dx,h_grandma
     mov ah,0ch
     mov al,0fh
 grandma_rhandloop:
-int 10h
-dec cx ; increase x values 
- inc dx ; decrease y values
- dec bx ; decrease length
- cmp bx,0
- jne grandma_rhandloop
+    int 10h
+    dec cx ; increase x values 
+    inc dx ; decrease y values
+    dec bx ; decrease length
+    cmp bx,0
+    jne grandma_rhandloop
  
- ;lf lag
-mov bx,10
-mov cx,240
-mov dx,165
-mov ah,0ch
-mov al,0fh
+;lf lag
+    mov bx,10
+    mov cx,x_centergrandma
+    mov dx,y_centergrandma
+    add dx,25
+    mov ah,0ch
+    mov al,0fh
 grandma_lfleg:
-int 10h
- inc cx  
- inc dx 
- dec bx 
- cmp bx,0
- jne grandma_lfleg 
+    int 10h
+    inc cx  
+    inc dx 
+    dec bx 
+    cmp bx,0
+    jne grandma_lfleg 
  ;r lag
     mov bx,10
-    mov cx,240
-    mov dx,165
+    mov cx,x_centergrandma
+    mov dx,y_centergrandma
+    add dx,25
     mov ah,0ch
     mov al,0fh
 grandma_rlegloop:
-int 10h
-dec cx ; increase x values 
- inc dx ; decrease y values
- dec bx ; decrease length
- cmp bx,0
- jne grandma_rlegloop 
+    int 10h
+    dec cx ; increase x values 
+    inc dx ; decrease y values
+    dec bx ; decrease length
+    cmp bx,0
+    jne grandma_rlegloop 
  
- ;woman scart
- 
- mov dx,175
- mov cx,230
- add cx,20
- woman:
- int 10h
- dec cx
- cmp cx,230
- jne woman
- 
- 
- mov dx,175
- add dx,10
- mov cx,235
- grandma_leg:
- int 10h
- dec dx
- cmp dx,176
- jne grandma_leg 
+;woman scart 
+    mov dx,y_centergrandma
+    add dx,35
+    mov cx,x_centergrandma
+    add cx,10
+    mov bx,y_centergrandma
+    add bx,100
+woman:
+    int 10h
+    dec cx 
+    ;cmp to the end of the skert
+    cmp cx,bx
+    jne woman
  
  
- mov dx,175
- add dx,10
- mov cx,245
- grandma_leg1:
- int 10h
- dec dx
- cmp dx,175
- jne grandma_leg1
+    mov dx,y_centergrandma
+    add dx,45            
+    mov cx,x_centergrandma
+    sub cx,5
+    mov bx,y_centergrandma
+    add bx,35
+    grandma_leg:
+    int 10h
+    dec dx
+    cmp dx,bx
+    jne grandma_leg 
+ 
+ 
+    mov dx,y_centergrandma
+    add dx,45
+    mov cx,x_centergrandma
+    add cx,5
+grandma_leg1:
+    int 10h
+    dec dx
+    cmp dx,175
+    jne grandma_leg1
  
   
 
@@ -618,7 +643,7 @@ start:
     push column
     push row
     push w
-    push 0fh 
+    push 1h 
     call drawall
     
     push column
@@ -626,13 +651,13 @@ start:
     add cx,h
     push cx
     push w
-    push 0fh 
+    push 1h 
     call drawall 
     
     push column
     push row
     push h
-    push 0fh 
+    push 1h 
     call drawfloor
      
     mov cx,column
@@ -640,17 +665,17 @@ start:
     push cx
     push row
     push h
-    push 0fh 
+    push 1h 
     call drawfloor
     
-    push 0fh
+    push 1h
     push row
     push column
     push 40
     call diagonalr
      
      
-    push 0fh
+    push 1h
     push 80
     push 50
     push 40
@@ -660,7 +685,7 @@ start:
     push column_grandma
     push row_grandma
     push w
-    push 0fh 
+    push 4h 
     call drawall_grandma
     
     push column_grandma
@@ -668,13 +693,13 @@ start:
     add cx,h
     push cx
     push w
-    push 0fh 
+    push 4h 
     call drawall_grandma 
     
     push column_grandma
     push row_grandma
     push h
-    push 0fh 
+    push 4h 
     call drawfloor
      
     mov cx,column_grandma
@@ -682,17 +707,17 @@ start:
     push cx
     push row_grandma
     push h
-    push 0fh 
+    push 4h 
     call drawfloor
  
-    push 0fh
+    push 4h
     push row_grandma
     push column_grandma
     push 40
     call  diagonalr
      
      
-    push 0fh
+    push 4h
     mov cx,row_grandma
     sub cx,40
     push cx
@@ -704,18 +729,154 @@ start:
     
      int 10h 
 
- mov x_center,30
 
- mov y_center,140
-
- mov y_value,0
-
- mov x_value,10
 
  call stickman
 
  call grandma
+ Redraw:           
 
+    mov ah,01h
+
+    int 16h    
+    jz Redraw
+    mov ah,00h
+    int 16h 
+    
+    
+    cmp al,120
+    je test2 
+    
+     cmp al,111
+    je test1
+    jmp Redraw
+    test1: 
+    cmp count,1
+    je draw_third_time
+    jmp Redraw 
+    test2:
+    cmp count,2
+    je draw_second_time
+    jmp Redraw 
+  
+    draw_second_time:
+    mov x_center_man , 30
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    mov color,0h
+    call stickman 
+    
+    mov color ,0fh
+    mov x_center_man , 130
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman 
+    
+    mov color ,0h
+    mov x_center_man , 130
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman  
+    
+    mov color ,0fh
+    mov x_center_man , 160
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman  
+    
+    mov color ,0h
+    mov x_center_man , 160
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman 
+    
+    mov color ,0fh
+    mov x_center_man , 190
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman  
+    
+    mov color ,0h
+    mov x_center_man , 190
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman  
+    
+    
+    mov color ,0fh
+    mov x_center_man , 290
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman 
+    mov count ,1  
+    jmp Redraw
+draw_third_time:    
+    mov color ,0h
+    mov x_center_man , 290
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman 
+    
+    mov color ,0fh
+    mov x_center_man , 190
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman
+    
+    mov color ,0h
+    mov x_center_man , 190
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10  
+    call stickman 
+    
+    mov color ,0fh
+    mov x_center_man , 160
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman 
+    
+    mov color ,0h
+    mov x_center_man , 160
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman
+    
+        mov color ,0fh
+    mov x_center_man , 130
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman
+    
+    mov color ,0h
+    mov x_center_man , 130
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    call stickman
+    
+    
+    mov x_center_man , 30
+    mov y_center_man , 140
+    mov y_value_man , 0
+    mov x_value_man , 10 
+    mov color,0fh 
+    call stickman
+     mov count ,2  
+    jmp Redraw
 exit:
 			
 
@@ -723,5 +884,6 @@ exit:
   int 21h
 
 END start
+
 
 
