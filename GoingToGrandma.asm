@@ -1,4 +1,5 @@
-; version 10.3
+
+; version 10.4
 .MODEL small
 .STACK 100h
 
@@ -22,17 +23,18 @@ length_man_of_stickman dw 10
 h_man dw 30
 ;================================
 x_centergrandma dw 250
-y_centergrandma dw 140
+y_centergrandma dw 145
 y_valuegrandma dw 0
 x_valuegrandma dw 10 
 second_decision dw ? 
 y_stickman dw 10
 h_grandma dw 15 
+;================================
 count dw 2
      
 .CODE
 
-drawall  proc 
+draw_roof_floor  proc 
       ; white
 	PUSH BP         ; save BP on stack
     MOV BP, SP
@@ -48,8 +50,8 @@ drawall  proc
 	jne next
 	pop bp
     ret 8
-    drawall endp
-drawfloor proc 
+    draw_roof_floor endp
+draw_walls proc 
     PUSH BP         ; save BP on stack
     MOV BP, SP
 	mov cx, [bp+10]; column
@@ -64,8 +66,8 @@ drawfloor proc
 	jne next1
 	pop bp
     ret 8 
-    drawfloor endp 
-drawall_grandma  proc 
+    draw_walls endp 
+draw_roof_floor_grandma  proc 
       ; white
 	PUSH BP         ; save BP on stack
     MOV BP, SP
@@ -81,7 +83,7 @@ drawall_grandma  proc
 	jne next2
 	pop bp
     ret 8
-    drawall_grandma endp
+    draw_roof_floor_grandma endp
     
     proc diagonalL
  mov bp,sp
@@ -592,7 +594,7 @@ grandma_rlegloop:
     mov cx,x_centergrandma
     add cx,10
     mov bx,y_centergrandma
-    add bx,100
+    add bx,95
 woman:
     int 10h
     dec cx 
@@ -618,10 +620,12 @@ woman:
     add dx,45
     mov cx,x_centergrandma
     add cx,5
+    mov bx,y_centergrandma
+    add bx,35
 grandma_leg1:
     int 10h
     dec dx
-    cmp dx,175
+    cmp dx,bx
     jne grandma_leg1
  
   
@@ -640,11 +644,12 @@ start:
 	mov al, 13h ; mode 13h = 320x200 pixels, 256 colors.
 	int 10h     ; set it!
     xor ax,ax
+    ;draw the roof
     push column
     push row
     push w
     push 1h 
-    call drawall
+    call draw_roof_floor
     
     push column
     mov cx,row
@@ -652,13 +657,13 @@ start:
     push cx
     push w
     push 1h 
-    call drawall 
+    call draw_roof_floor 
     
     push column
     push row
     push h
     push 1h 
-    call drawfloor
+    call draw_walls
      
     mov cx,column
     add cx, w
@@ -666,7 +671,7 @@ start:
     push row
     push h
     push 1h 
-    call drawfloor
+    call draw_walls
     
     push 1h
     push row
@@ -681,35 +686,36 @@ start:
     push 40
     call diagonalL 
    
-    ;home of grandma
+    ;===home of grandma===
+    ;draw the roof
     push column_grandma
     push row_grandma
     push w
     push 4h 
-    call drawall_grandma
-    
+    call draw_roof_floor_grandma
+    ;draw the floor
     push column_grandma
     mov cx,row_grandma
     add cx,h
     push cx
     push w
     push 4h 
-    call drawall_grandma 
-    
+    call draw_roof_floor_grandma 
+    ;draw left wall
     push column_grandma
     push row_grandma
     push h
     push 4h 
-    call drawfloor
-     
+    call draw_walls
+    ;draw r wall 
     mov cx,column_grandma
     add cx, w
     push cx
     push row_grandma
     push h
     push 4h 
-    call drawfloor
- 
+    call draw_walls
+    ;draw l roof
     push 4h
     push row_grandma
     push column_grandma
@@ -726,14 +732,11 @@ start:
     push cx
     push 40
     call diagonalL 
+    int 10h     
     
-     int 10h 
-
-
-
- call stickman
-
- call grandma
+    call stickman
+    call grandma
+ ;see if the user typed x or o/in the right time
  Redraw:           
 
     mov ah,01h
@@ -758,7 +761,7 @@ start:
     cmp count,2
     je draw_second_time
     jmp Redraw 
-  
+    ;show the man waking to grandma
     draw_second_time:
     mov x_center_man , 30
     mov y_center_man , 140
@@ -817,7 +820,8 @@ start:
     mov x_value_man , 10 
     call stickman 
     mov count ,1  
-    jmp Redraw
+    jmp Redraw 
+    ;draw the man waking back
 draw_third_time:    
     mov color ,0h
     mov x_center_man , 290
@@ -884,6 +888,7 @@ exit:
   int 21h
 
 END start
+
 
 
 
