@@ -1,5 +1,5 @@
 
-; version 10.4
+; version 10.5
 .MODEL small
 .STACK 100h
 
@@ -30,12 +30,29 @@ second_decision dw ?
 y_stickman dw 10
 h_grandma dw 15 
 ;================================
+
+logo db 13,10,'      _ __ ___   __ _ _ __ ___   __ _  '
+db 13,10,'     | '_ ` _ \ / _` | '_ ` _ \ / _` | '
+db 13,10,'     | | | | | | (_| | | | | | | (_| | '
+db 13,10,'     |_| |_| |_|\__,_|_| |_| |_|\__,_| ',13,10,'$'
+                                   
+
 count dw 2
-     
 .CODE
+proc delay
+	pusha
+	mov cx, 03h   ;High Word
+	mov dx, 4240h ;Low Word
+	mov ah, 86h   ;Wait
+	int 15h
+	popa
+	ret
+endp delay
+
 
 draw_roof_floor  proc 
-      ; white
+; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer  
 	PUSH BP         ; save BP on stack
     MOV BP, SP
 	mov cx, [bp+10]; column
@@ -49,9 +66,11 @@ draw_roof_floor  proc
 	cmp cx,column
 	jne next
 	pop bp
-    ret 8
+    ret 8 ; draw the roof and floor
     draw_roof_floor endp
-draw_walls proc 
+draw_walls proc
+    ; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer  
     PUSH BP         ; save BP on stack
     MOV BP, SP
 	mov cx, [bp+10]; column
@@ -65,10 +84,11 @@ draw_walls proc
 	cmp dx,row
 	jne next1
 	pop bp
-    ret 8 
+    ret 8  ; draw the walls 
     draw_walls endp 
 draw_roof_floor_grandma  proc 
-      ; white
+    ; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer 
 	PUSH BP         ; save BP on stack
     MOV BP, SP
 	mov cx, [bp+10]; column
@@ -82,14 +102,14 @@ draw_roof_floor_grandma  proc
 	cmp cx,column_grandma
 	jne next2
 	pop bp
-    ret 8
+    ret 8  ; draw the floor or roof for the grendma
     draw_roof_floor_grandma endp
     
     proc diagonalL
+ ; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer 
  mov bp,sp
  pusha
- 
-
  mov bx, [bp+2] ; length
  mov cx, [bp+4] ; x values
  mov dx, [bp+6] ; y values
@@ -104,9 +124,11 @@ draw_roof_floor_grandma  proc
  cmp bx,0
  jne diagonalLLoop
  popa
- ret
+ ret;draw the diagonal row
     endp diagonalL  
-    proc diagonalR
+    proc diagonalR 
+         ; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer
  mov bp,sp
  pusha
  
@@ -125,12 +147,13 @@ draw_roof_floor_grandma  proc
  cmp bx,0
  jne diagonalRLoop
  popa
- ret
+ ret   ;draw the diangonal row
     endp diagonalR
     
     
    proc stickman
-
+ ; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer (in the body of the stickman bx is used to cmp)
  
 
 
@@ -354,7 +377,7 @@ rlegloop:
     cmp bx,0
     jne rlegloop
 
-ret
+ret  ; draw the stickman
 endp stickman
     
     
@@ -367,7 +390,8 @@ proc grandma
 
  
 
-
+; cx= column 
+;dx = row ,al color ,ah=the command - change color for a single pixel,bp is saved and sp is stack pointer  (in the body of the stickman bx is used to cmp)
 
      mov bx, x_valuegrandma
      mov ax,2
@@ -629,7 +653,7 @@ grandma_leg1:
     jne grandma_leg1
  
   
-
+;draw the grandma
 ret
 endp grandma
 
@@ -640,6 +664,11 @@ start:
 	mov ax, @data
     mov ds, ax 
 	
+	lea dx,logo
+	mov ah,09h
+	int 21h
+	mov ah,1
+	int 21h
 	mov ah, 0   ; set display mode function.
 	mov al, 13h ; mode 13h = 320x200 pixels, 256 colors.
 	int 10h     ; set it!
@@ -769,14 +798,14 @@ start:
     mov x_value_man , 10 
     mov color,0h
     call stickman 
-    
+    call delay
     mov color ,0fh
     mov x_center_man , 130
     mov y_center_man , 140
     mov y_value_man , 0
     mov x_value_man , 10 
     call stickman 
-    
+    call delay
     mov color ,0h
     mov x_center_man , 130
     mov y_center_man , 140
@@ -790,7 +819,7 @@ start:
     mov y_value_man , 0
     mov x_value_man , 10 
     call stickman  
-    
+    call delay
     mov color ,0h
     mov x_center_man , 160
     mov y_center_man , 140
@@ -804,7 +833,7 @@ start:
     mov y_value_man , 0
     mov x_value_man , 10 
     call stickman  
-    
+    call delay
     mov color ,0h
     mov x_center_man , 190
     mov y_center_man , 140
@@ -812,7 +841,7 @@ start:
     mov x_value_man , 10 
     call stickman  
     
-    
+    call delay
     mov color ,0fh
     mov x_center_man , 290
     mov y_center_man , 140
@@ -836,7 +865,7 @@ draw_third_time:
     mov y_value_man , 0
     mov x_value_man , 10 
     call stickman
-    
+    call delay
     mov color ,0h
     mov x_center_man , 190
     mov y_center_man , 140
@@ -850,7 +879,7 @@ draw_third_time:
     mov y_value_man , 0
     mov x_value_man , 10 
     call stickman 
-    
+    call delay
     mov color ,0h
     mov x_center_man , 160
     mov y_center_man , 140
@@ -864,7 +893,7 @@ draw_third_time:
     mov y_value_man , 0
     mov x_value_man , 10 
     call stickman
-    
+    call delay
     mov color ,0h
     mov x_center_man , 130
     mov y_center_man , 140
@@ -888,7 +917,6 @@ exit:
   int 21h
 
 END start
-
 
 
 
